@@ -1,5 +1,6 @@
 "use client";
 
+import { addToCart } from "~/app/actions/cart";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
 
@@ -9,25 +10,13 @@ export function OrderButton({ id }: { id: string }) {
   return (
     <Button
       onClick={async () => {
-        const response = await fetch("/api/cart", {
-          method: "POST",
-          body: JSON.stringify({ id }),
-          redirect: "manual",
+        await addToCart(id);
+
+        toast({
+          title: "Added to cart",
+          description: "Your item has been added to the cart",
+          variant: "success",
         });
-
-        if (response.status === 200) {
-          const { cookieName } = (await response.json()) as {
-            cookieName: string;
-          };
-
-          // TODO: send analytics via clerk metadata
-
-          toast({
-            title: "Added to cart",
-            description: "Your item has been added to the cart",
-            variant: "success",
-          });
-        }
       }}
     >
       Add to cart

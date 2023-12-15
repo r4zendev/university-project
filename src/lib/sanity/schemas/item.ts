@@ -27,6 +27,7 @@ export const itemSchema = defineType({
       name: "discount",
       title: "Discount",
       type: "number",
+      validation: (Rule) => Rule.min(0).max(100),
     }),
     defineField({
       name: "slug",
@@ -46,7 +47,7 @@ export const itemSchema = defineType({
       name: "views",
       type: "number",
       title: "Views",
-      hidden: (context) => context.value === 0,
+      hidden: true,
       readOnly: true,
       initialValue: 0,
     }),

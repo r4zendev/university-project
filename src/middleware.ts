@@ -8,7 +8,7 @@ import { env } from "~/env.mjs";
 export default authMiddleware({
   // publicRoutes: ["/", "/contact"],
   publicRoutes: ["((?!^/admin/).*)"],
-  debug: env.NODE_ENV === "development",
+  // debug: env.NODE_ENV === "development",
 });
 
 export const config = {

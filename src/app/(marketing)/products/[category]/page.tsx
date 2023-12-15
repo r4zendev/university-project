@@ -1,7 +1,7 @@
-export default function ProductsByType() {
+export default function ProductsByCategory() {
   return (
     <p className="flex min-h-screen flex-col items-center justify-center">
-      I want to be statically generated
+      Nothing here...
     </p>
   );
 }

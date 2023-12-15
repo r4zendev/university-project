@@ -13,7 +13,7 @@ import { type ReactNode } from "react";
 import { MetalsWidget } from "~/components/metals";
 import { getSocialLinks } from "~/lib/sanity/queries";
 import { type SocialProvider } from "~/lib/types";
-import { getCartFromCookie } from "~/lib/utils/cart";
+import { getCartCookie } from "~/lib/utils/cookies";
 import { MainNav } from "./_components/main-nav";
 import { Search } from "./_components/search";
 
@@ -103,7 +103,8 @@ export default async function MainLayout({
   modal: React.ReactNode;
 }) {
   const socialLinks = await getSocialLinks();
-  const cartCookie = getCartFromCookie();
+  const { value: cart } = getCartCookie();
+  const cartLength = cart ? Object.keys(cart).length : 0;
 
   return (
     <div>
@@ -121,9 +122,9 @@ export default async function MainLayout({
 
             <Link href="/cart" className="relative">
               <ShoppingCart />
-              {cartCookie && cartCookie.cart.length > 0 && (
+              {cartLength > 0 && (
                 <span className="absolute -top-1 -right-1 text-xs font-semibold text-white bg-red-500 rounded-full px-1">
-                  {cartCookie.cart.length}
+                  {cartLength}
                 </span>
               )}
             </Link>

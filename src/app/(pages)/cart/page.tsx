@@ -1,10 +1,10 @@
 import { getItems } from "~/lib/sanity/queries";
-import { getCartFromCookie } from "~/lib/utils/cart";
+import { getCartCookie } from "~/lib/utils/cookies";
 
 export default async function Cart() {
-  const cartCookie = getCartFromCookie();
-  if (!cartCookie) return <p>Cart is empty</p>;
-  const items = await getItems({ ids: cartCookie.cart });
+  const { value: cart } = getCartCookie();
+  if (!cart) return <p>Cart is empty</p>;
+  const items = await getItems({ ids: Object.keys(cart) });
 
   return (
     <div>
@@ -12,9 +12,18 @@ export default async function Cart() {
         return (
           <div key={`item-${item.name}`} className="xl:container">
             <p>{item.name}</p>
-            <p>{item.price}</p>
-            <p>{item.discountedPrice}</p>
+            <p>
+              {item.discount ? (
+                <span className="text-primary font-semibold space-x-2">
+                  <s className="text-red-400">{item.price}</s>
+                  <span>{item.price}</span>
+                </span>
+              ) : (
+                item.price
+              )}
+            </p>
             <p>{item.description}</p>
+            <p>Quantity: {cart[item._id]}</p>
           </div>
         );
       })}

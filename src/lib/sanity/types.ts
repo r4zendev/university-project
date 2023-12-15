@@ -22,6 +22,7 @@ export type Item = {
   price: number;
   slug: string;
   image: string;
+  discount?: number;
   discountedPrice?: number;
   url: string;
   content: string;

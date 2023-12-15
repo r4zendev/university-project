@@ -36,6 +36,17 @@ export function TrendingItem({ item }: { item: Item }) {
   );
 }
 
+export function ViewedItem({ item }: { item: Item }) {
+  return (
+    <Link
+      href={`/products/${item.category.slug}/${item._id}`}
+      className="overflow-hidden rounded-md w-[16rem] shrink-0"
+    >
+      <ContentCard item={item} />
+    </Link>
+  );
+}
+
 export function CategoryItem({ item }: { item: Category }) {
   return (
     <Link
