@@ -9,17 +9,16 @@ import {
   getTrendingItems,
 } from "~/lib/sanity/queries";
 import { getViewsCookie } from "~/lib/utils/cookies";
-import {
-  CategoryItem,
-  TrendingItem,
-  ViewedItem,
-} from "./_components/list-item";
+import { CategoryItem, ListItem } from "./_components/list-item";
 
 export default async function Home() {
-  const categories = await getCategories();
-  const trendingItems = await getTrendingItems();
   const carouselItems = await getSliderImages();
   const banner = await getBannerImage();
+
+  const categories = await getCategories();
+  const featuredItems = await getItems({ featured: true });
+  const trendingItems = await getTrendingItems();
+
   const { value: viewed } = getViewsCookie();
   const viewedItems = viewed ? await getItems({ ids: viewed }) : [];
 
@@ -44,15 +43,15 @@ export default async function Home() {
         </div>
       </div>
 
-      {viewedItems.length > 0 && (
+      {featuredItems.length > 0 && (
         <div className="w-full my-4 px-8 py-4 rounded-xl bg-white">
           <h2 className="text-2xl font-semibold text-primary-foreground">
-            Recently viewed
+            Featured items
           </h2>
 
           <div className="flex items-center gap-4 justify-center mt-4">
-            {viewedItems.map((item) => (
-              <ViewedItem key={item.name} item={item} />
+            {featuredItems.map((item) => (
+              <ListItem key={item.name} item={item} />
             ))}
           </div>
         </div>
@@ -65,10 +64,24 @@ export default async function Home() {
 
         <div className="flex items-center gap-4 justify-center mt-4">
           {trendingItems.map((item) => (
-            <TrendingItem key={item._id} item={item} />
+            <ListItem key={item._id} item={item} />
           ))}
         </div>
       </div>
+
+      {viewedItems.length > 0 && (
+        <div className="w-full my-4 px-8 py-4 rounded-xl bg-white">
+          <h2 className="text-2xl font-semibold text-primary-foreground">
+            Recently viewed
+          </h2>
+
+          <div className="flex items-center gap-4 justify-center mt-4">
+            {viewedItems.map((item) => (
+              <ListItem key={item.name} item={item} />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* <NewestCollections /> */}
 

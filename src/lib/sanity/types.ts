@@ -21,7 +21,7 @@ export type Item = {
   description?: string;
   price: number;
   slug: string;
-  image: string;
+  images: string[];
   discount?: number;
   discountedPrice?: number;
   url: string;
@@ -35,4 +35,16 @@ export type SocialLink = {
   _createdAt: string;
   provider: SocialProvider;
   url: string;
+};
+
+type NavLink = {
+  title: string;
+  link: string;
+};
+
+export type Navigation = NavLink & {
+  subnav: {
+    title: string;
+    links: NavLink[];
+  }[];
 };

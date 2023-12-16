@@ -30,6 +30,11 @@ export const itemSchema = defineType({
       validation: (Rule) => Rule.min(0).max(100),
     }),
     defineField({
+      name: "featured",
+      title: "Featured",
+      type: "boolean",
+    }),
+    defineField({
       name: "slug",
       title: "Slug",
       type: "slug",
@@ -52,17 +57,13 @@ export const itemSchema = defineType({
       initialValue: 0,
     }),
     defineField({
-      name: "image",
-      title: "Image",
-      type: "image",
-      options: { hotspot: true },
-      fields: [
-        {
-          name: "alt",
-          title: "Alt",
-          type: "string",
-        },
-      ],
+      name: "images",
+      title: "Images",
+      type: "array",
+      description:
+        "Add images to show in the gallery. First image will be used as the main image.",
+      of: [{ type: "image", options: { hotspot: true } }],
+      initialValue: [],
     }),
     defineField({
       name: "content",
@@ -72,5 +73,3 @@ export const itemSchema = defineType({
     }),
   ],
 });
-
-export type Item = typeof itemSchema;

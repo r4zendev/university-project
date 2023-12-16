@@ -2,22 +2,23 @@ import { groq } from "next-sanity";
 
 import { logger } from "~/lib/utils/log";
 import { sanityClient } from "./client";
-import type { Banner, Category, Item, SocialLink } from "./types";
+import type { Banner, Category, Item, Navigation, SocialLink } from "./types";
 
 export async function getItems(options?: {
   ids?: string[];
   limit?: number;
+  featured?: boolean;
 }): Promise<Item[]> {
-  const { ids, limit } = options ?? {};
+  const { ids, limit, featured } = options ?? {};
   const params = Object.fromEntries(
     Object.entries({ ids, limit }).filter(([, value]) => Boolean(value)),
   );
 
   try {
     return await sanityClient.fetch(
-      groq`*[_type == "item"${ids ? " && _id in $ids" : ""}]${
-        limit ? `[0...${limit}]` : ""
-      }{
+      groq`*[_type == "item"${ids ? " && _id in $ids" : ""}${
+        featured ? " && featured == true" : ""
+      }]${limit ? `[0...${limit}]` : ""}{
       _id,
       _createdAt,
       name,
@@ -25,8 +26,8 @@ export async function getItems(options?: {
       "slug": slug.current,
       price,
       discount,
+      "images": images[].asset->url,
       "discountedPrice": price * (1 - discount / 100),
-      "image": image.asset->url,
       "category": category->{
         name,
         "image": image.asset->url,
@@ -54,7 +55,7 @@ export async function getTrendingItems(limit?: number): Promise<Item[]> {
         discount,
         "discountedPrice": price * (1 - discount / 100),
         "slug": slug.current,
-        "image": image.asset->url,
+        "images": images[].asset->url,
         "category": category->{
           name,
           "image": image.asset->url,
@@ -79,7 +80,7 @@ export async function getItemById(id: string): Promise<Item | null> {
         name,
         description,
         "slug": slug.current,
-        "image": image.asset->url,
+        "images": images[].asset->url,
         price,
         discount,
         "discountedPrice": price * (1 - discount / 100),
@@ -168,6 +169,29 @@ export async function getSocialLinks(): Promise<SocialLink[]> {
     );
   } catch (err) {
     logger.error({ err }, "Error fetching social links");
+    return [];
+  }
+}
+
+export async function getNavLinks(
+  type: "header" | "products" | "footer",
+): Promise<Navigation[]> {
+  try {
+    return await sanityClient.fetch(
+      groq`*[_type == "nav" && position == "${type}"]{
+        title,
+        link,
+        subnav[] {
+          title,
+          links[] {
+            title,
+            link,
+          }
+        }
+      }`,
+    );
+  } catch (err) {
+    logger.error({ err }, "Error fetching navigation links");
     return [];
   }
 }

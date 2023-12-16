@@ -1,10 +1,16 @@
+/* eslint-disable @typescript-eslint/require-await */
 "use server";
 
-import { addToCartCookie } from "~/lib/utils/cookies";
+import { addToCartCookie, deleteFromCartCookie } from "~/lib/utils/cookies";
 
-// eslint-disable-next-line @typescript-eslint/require-await
 export async function addToCart(id: string) {
   addToCartCookie(id);
   // TODO: Send analytics event for add to cart
+  // await sendAnalytics()
+}
+
+export async function removeFromCart(id: string) {
+  deleteFromCartCookie(id);
+  // TODO: Send analytics event for delete from cart
   // await sendAnalytics()
 }

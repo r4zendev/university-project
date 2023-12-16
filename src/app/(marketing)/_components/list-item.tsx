@@ -5,14 +5,18 @@ import { Card, CardContent } from "~/components/ui/card";
 import type { Category, Item } from "~/lib/sanity/types";
 import { cn } from "~/lib/utils";
 
-const ContentCard = ({ item }: { item: { name: string; image?: string } }) => (
+const ContentCard = ({
+  item,
+}: {
+  item: { name: string; image: string | undefined };
+}) => (
   <Card className="relative overflow-hidden">
     <CardContent>
       <Image
         src={item.image ?? "/placeholder.webp"}
         alt={item.name ?? "Item"}
-        width={200}
-        height={200}
+        width={500}
+        height={500}
         className={cn(
           "h-auto w-auto object-cover transition-all hover:scale-105",
         )}
@@ -25,24 +29,13 @@ const ContentCard = ({ item }: { item: { name: string; image?: string } }) => (
   </Card>
 );
 
-export function TrendingItem({ item }: { item: Item }) {
+export function ListItem({ item }: { item: Item }) {
   return (
     <Link
       href={`/products/${item.category.slug}/${item._id}`}
       className="overflow-hidden rounded-md w-[16rem] shrink-0"
     >
-      <ContentCard item={item} />
-    </Link>
-  );
-}
-
-export function ViewedItem({ item }: { item: Item }) {
-  return (
-    <Link
-      href={`/products/${item.category.slug}/${item._id}`}
-      className="overflow-hidden rounded-md w-[16rem] shrink-0"
-    >
-      <ContentCard item={item} />
+      <ContentCard item={{ name: item.name, image: item.images[0] }} />
     </Link>
   );
 }

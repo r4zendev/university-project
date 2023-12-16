@@ -11,10 +11,11 @@ import Link from "next/link";
 import { type ReactNode } from "react";
 
 import { MetalsWidget } from "~/components/metals";
-import { getSocialLinks } from "~/lib/sanity/queries";
+import { getNavLinks, getSocialLinks } from "~/lib/sanity/queries";
 import { type SocialProvider } from "~/lib/types";
 import { getCartCookie } from "~/lib/utils/cookies";
 import { MainNav } from "./_components/main-nav";
+import { ProductsNavigation } from "./_components/products-navigation";
 import { Search } from "./_components/search";
 
 import "~/styles/globals.css";
@@ -102,13 +103,14 @@ export default async function MainLayout({
   children: React.ReactNode;
   modal: React.ReactNode;
 }) {
+  const productsNavLinks = await getNavLinks("products");
   const socialLinks = await getSocialLinks();
   const { value: cart } = getCartCookie();
   const cartLength = cart ? Object.keys(cart).length : 0;
 
   return (
     <div>
-      <header className="border-b bg-white">
+      <header className="border-b">
         <div className="flex h-16 items-center px-4 xl:container">
           <Link href="/">
             <Image src="/logo-large.png" alt="logo" width={100} height={80} />
@@ -131,6 +133,8 @@ export default async function MainLayout({
           </div>
         </div>
       </header>
+
+      <ProductsNavigation links={productsNavLinks} />
 
       <main className="xl:container">
         {modal}

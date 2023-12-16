@@ -39,9 +39,7 @@ export default function EmptyLayout({
 }) {
   return (
     <html lang="en">
-      <body
-        className={`font-sans ${supreme.variable} bg-gradient-to-br from-secondary via-primary/60 to-primary`}
-      >
+      <body className={`font-sans ${supreme.variable} bg-white`}>
         <ClerkProvider>
           <ContextProviders>
             <Toaster />
