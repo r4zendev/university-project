@@ -54,13 +54,13 @@ const metalNames: Record<string, string> = {
 const getMetalsData = unstable_cache(
   async () => {
     const metals = await fetch(
-      "https://api.metals.dev/v1/latest?api_key=SXQGJMVJ7TGPDKIK0KCP331IK0KCP&currency=USD&unit=toz",
+      "https://api.metals.dev/v1/latest?api_key=SXQGJMVJ7TGPDKIK0KCP331IK0KCP&currency=USD&unit=toz"
     );
 
     return metals.json() as Promise<MetalsResponse>;
   },
   ["metals-data"],
-  { revalidate: 60 * 60 * 24 },
+  { revalidate: 60 * 60 * 24 }
 );
 
 export async function MetalsWidget() {
@@ -70,16 +70,16 @@ export async function MetalsWidget() {
     <Card>
       <CardContent>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Metals</CardTitle>
+          <CardTitle className="text-2xl font-bold text-primary">Metals</CardTitle>
         </CardHeader>
 
         <ScrollArea className="h-32">
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col space-y-2 px-4">
             {metals.status === "success" ? (
               Object.entries(metals.metals).map(([metal, price]) => (
-                <div key={metal} className="flex justify-between">
-                  <span>{metalNames[metal]}</span>
-                  <span>{price}</span>
+                <div key={metal} className="flex justify-between gap-4">
+                  <span className="font-semibold">{metalNames[metal]}</span>
+                  <span className="font-medium text-accent">${price}</span>
                 </div>
               ))
             ) : (

@@ -1,4 +1,5 @@
 import { defineConfig } from "sanity";
+import { markdownSchema } from "sanity-plugin-markdown";
 import { deskTool } from "sanity/desk";
 
 import { schemas } from "~/lib/sanity/schemas";
@@ -11,6 +12,6 @@ export default defineConfig({
   dataset,
   title: "Jewelry Store",
   basePath: "/admin",
-  plugins: [deskTool()],
+  plugins: [deskTool(), markdownSchema()],
   schema: { types: schemas },
 });

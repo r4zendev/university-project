@@ -7,5 +7,6 @@ export const sanityClient = createClient({
   dataset: env.NEXT_PUBLIC_SANITY_DATASET,
   studioUrl: "/admin",
   apiVersion: "2023-05-12",
-  useCdn: true,
+  useCdn: false,
+  token: env.SANITY_TOKEN,
 });

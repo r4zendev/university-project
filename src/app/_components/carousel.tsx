@@ -6,12 +6,9 @@ import useEmblaCarousel, {
   type EmblaOptionsType,
 } from "embla-carousel-react";
 import Image from "next/image";
-import React, {
-  type PropsWithChildren,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useState, type PropsWithChildren } from "react";
+
+import { ListItem, type MinimumAcceptableItem } from "./list-item";
 
 type ButtonPropType = PropsWithChildren<
   React.DetailedHTMLProps<
@@ -39,11 +36,7 @@ export const PrevButton: React.FC<ButtonPropType> = (props) => {
   const { children, ...restProps } = props;
 
   return (
-    <button
-      className="embla__button embla__button--prev"
-      type="button"
-      {...restProps}
-    >
+    <button className="embla__button embla__button--prev" type="button" {...restProps}>
       <svg className="embla__button__svg" viewBox="0 0 532 532">
         <path
           fill="currentColor"
@@ -59,11 +52,7 @@ export const NextButton: React.FC<ButtonPropType> = (props) => {
   const { children, ...restProps } = props;
 
   return (
-    <button
-      className="embla__button embla__button--next"
-      type="button"
-      {...restProps}
-    >
+    <button className="embla__button embla__button--next" type="button" {...restProps}>
       <svg className="embla__button__svg" viewBox="0 0 532 532">
         <path
           fill="currentColor"
@@ -75,43 +64,65 @@ export const NextButton: React.FC<ButtonPropType> = (props) => {
   );
 };
 
-type PropType = {
-  slides: string[];
+type ItemCarouselProps = {
+  slides: MinimumAcceptableItem[];
   options?: EmblaOptionsType & AutoplayOptionsType;
 };
 
-// export const FrontPageCarousel: React.FC<PropType> = (props) => {
-//   const { slides, options } = props;
-//   const [emblaRef] = useEmblaCarousel(options, [Autoplay(options)]);
+export const DragFreeItemsCarousel: React.FC<ItemCarouselProps> = (props) => {
+  const { slides } = props;
+  const [emblaRef] = useEmblaCarousel({
+    dragFree: true,
+    containScroll: "trimSnaps",
+  });
 
-//   return (
-//     <div className="embla">
-//       <div className="embla__viewport" ref={emblaRef}>
-//         <div className="embla__container">
-//           {slides.map((src, index) => (
-//             <div className="embla__slide" key={index}>
-//               <div className="embla__slide__number">
-//                 <span>{index + 1}</span>
-//               </div>
-//               <img
-//                 className="embla__slide__img"
-//                 src={src}
-//                 alt="Your alt text"
-//               />
-//               {/* <Image
-//                 className="embla__slide__img"
-//                 width={1280}
-//                 height={768}
-//                 src={src}
-//                 alt="Your alt text"
-//               /> */}
-//             </div>
-//           ))}
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
+  return (
+    <div className="relative w-full">
+      <div className="embla embla-three-slides p-4">
+        <div className="embla__viewport" ref={emblaRef}>
+          <div className="embla__container">
+            {slides.map((item, index) => (
+              <div className="embla__slide" key={index}>
+                {item.images[0] && <ListItem item={item} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+type SimplePropType = {
+  slides: JSX.Element[];
+  options?: EmblaOptionsType & AutoplayOptionsType;
+};
+
+export const SimpleTextCarousel: React.FC<SimplePropType> = (props) => {
+  const { slides, options } = props;
+  const [emblaRef] = useEmblaCarousel(options, [Autoplay(options)]);
+
+  return (
+    <div className="relative w-full">
+      <div className="embla embla-fullwidth-slide">
+        <div className="embla__viewport" ref={emblaRef}>
+          <div className="embla__container">
+            {slides.map((item, index) => (
+              <div className="embla__slide" key={`slide-${index}`}>
+                <>{item}</>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+type PropType = {
+  slides: unknown[];
+  options?: EmblaOptionsType & AutoplayOptionsType;
+};
 
 export const FrontPageCarousel: React.FC<PropType> = (props) => {
   const { slides, options } = props;
@@ -121,7 +132,7 @@ export const FrontPageCarousel: React.FC<PropType> = (props) => {
 
   const scrollTo = useCallback(
     (index: number) => emblaApi && emblaApi.scrollTo(index),
-    [emblaApi],
+    [emblaApi]
   );
 
   const onInit = useCallback((emblaApi: EmblaCarouselType) => {
@@ -143,13 +154,17 @@ export const FrontPageCarousel: React.FC<PropType> = (props) => {
   }, [emblaApi, onInit, onSelect]);
 
   return (
-    <div className="w-full relative">
-      <div className="embla">
+    <div className="relative w-full">
+      <div className="embla embla-fullwidth-slide">
         <div className="embla__viewport" ref={emblaRef}>
           <div className="embla__container">
-            {slides.map((src, index) => (
-              <div className="embla__slide" key={`slide-${index}`}>
-                <Image fill src={src} alt="Alt logo" />
+            {slides.map((item, index) => (
+              <div className="embla__slide h-[--slide-height]" key={`slide-${index}`}>
+                {typeof item === "string" ? (
+                  <Image fill src={item} alt="Alt logo" />
+                ) : (
+                  <>{item}</>
+                )}
               </div>
             ))}
           </div>
@@ -164,7 +179,7 @@ export const FrontPageCarousel: React.FC<PropType> = (props) => {
             onPointerUp={() => emblaApi?.plugins().autoplay?.play()}
             onClick={() => scrollTo(index)}
             className={"embla__dot".concat(
-              index === selectedIndex ? " embla__dot--selected" : "",
+              index === selectedIndex ? " embla__dot--selected" : ""
             )}
           />
         ))}

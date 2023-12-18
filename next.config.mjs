@@ -6,12 +6,9 @@ await import("./src/env.mjs");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  images: {
-    remotePatterns: [{ hostname: "cdn.sanity.io" }],
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  images: { remotePatterns: [{ hostname: "cdn.sanity.io" }] },
+  typescript: { ignoreBuildErrors: true },
+  // logging: { fetches: { fullUrl: true } },
 };
 
 export default config;

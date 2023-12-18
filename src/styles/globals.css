@@ -14,16 +14,16 @@
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 168 60% 56%;
-    --primary-foreground: 0 0% 15%;
+    --primary-foreground: 0 100% 100%;
 
-    --secondary: 349, 100%, 90%;
+    --secondary: 349 100% 90%;
     --secondary-foreground: 0 0% 10%;
 
     --muted: 60 4% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 168 60% 76%;
-    --accent-foreground: 0 0% 15%;
+    --accent: 168 80% 36%;
+    --accent-foreground: 0 100% 100%;
 
     --success: 120 44% 66%;
     --success-foreground: 205 4.5% 50%;
@@ -36,36 +36,6 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
   }
 }
 
@@ -80,6 +50,39 @@
 
 /* Carousel */
 .embla {
+  --slide-spacing: 1rem;
+  --slide-size: 50%;
+  --slide-height: 19rem;
+}
+.embla-three-slides {
+  --slide-height: 12rem;
+  --slide-size: 30%;
+}
+.embla-fullwidth-slide {
+  --slide-size: 100%;
+}
+.embla__viewport {
+  overflow: hidden;
+}
+.embla__container {
+  backface-visibility: hidden;
+  display: flex;
+  touch-action: pan-y;
+  margin-left: calc(var(--slide-spacing) * -1);
+}
+.embla__slide {
+  flex: 0 0 var(--slide-size);
+  min-width: 0;
+  padding-left: var(--slide-spacing);
+  position: relative;
+}
+.embla__slide__img {
+  display: block;
+  height: var(--slide-height);
+  width: 100%;
+  object-fit: cover;
+}
+/* .embla {
   --slide-spacing: 1rem;
   --slide-size: 100%;
   --slide-height: 19rem;
@@ -99,8 +102,13 @@
   padding-left: var(--slide-spacing);
   position: relative;
   height: var(--slide-height);
-  width: 100%;
 }
+.embla__slide__img {
+  display: block;
+  height: var(--slide-height);
+  width: 100%;
+  object-fit: cover;
+} */
 .embla__button {
   appearance: none;
   background-color: transparent;
@@ -174,9 +182,5 @@
   content: "";
 }
 .embla__dot--selected:after {
-  background: linear-gradient(
-    45deg,
-    hsl(var(--primary)),
-    hsl(var(--secondary))
-  );
+  background: linear-gradient(45deg, hsl(var(--primary)), hsl(var(--secondary)));
 }

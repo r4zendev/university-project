@@ -17,20 +17,43 @@ export const bannerSchema = defineType({
           type: "string",
         },
       ],
-      validation: (Rule) => Rule.required(),
+      hidden: ({ document }) => (document?.position as string) === "header",
+      validation: (rule) =>
+        rule.custom((currentValue, { document }) => {
+          if ((document?.position as string) === "header" || currentValue) return true;
+
+          return "This is required with currently used banner type";
+        }),
+    }),
+    defineField({
+      name: "text",
+      title: "Text content",
+      type: "markdown",
+      hidden: ({ document }) => (document?.position as string) !== "header",
+      validation: (rule) =>
+        rule.custom((currentValue, { document }) => {
+          if (
+            (document?.position as string) === "header" &&
+            currentValue === undefined
+          ) {
+            return "This is required with currently used banner type";
+          }
+
+          return true;
+        }),
     }),
     defineField({
       name: "url",
       title: "Link",
       type: "string",
-      validation: (Rule) => Rule.required().regex(/https?:\/\/.+/),
+      validation: (Rule) => Rule.regex(/^\/([^\/\s]+\/?)*$/),
     }),
     defineField({
       name: "position",
       title: "Position",
       type: "string",
       options: {
-        list: ["slider", "top"],
+        list: ["slider", "top", "header"],
       },
     }),
   ],

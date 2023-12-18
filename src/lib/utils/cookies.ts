@@ -3,6 +3,7 @@ import { number, record, safeParse } from "valibot";
 
 export const CART_COOKIE_NAME = "cart_cookie";
 export const VIEWS_COOKIE_NAME = "recently_viewed";
+export const WISHLIST_COOKIE_NAME = "wishlist_cookie";
 
 type ArrayCookieFunctionReturn = { name: string; value: string[] | null };
 type ObjectCookieFunctionReturn = {
@@ -10,9 +11,7 @@ type ObjectCookieFunctionReturn = {
   value: Record<string, number> | null;
 };
 
-export function getObjectCookie(
-  cookieName: string,
-): ObjectCookieFunctionReturn {
+export function getObjectCookie(cookieName: string): ObjectCookieFunctionReturn {
   const cookie = cookies().get(cookieName);
 
   if (!cookie) return { name: cookieName, value: null };
@@ -29,16 +28,14 @@ export function getObjectCookie(
 
 export function addToObjectCookie(
   cookieName: string,
-  item: string,
+  item: string
 ): ObjectCookieFunctionReturn {
   const existingValue = getObjectCookie(cookieName);
   const newValue = {
     ...existingValue.value,
     [item]: existingValue.value?.[item] ? existingValue.value[item]! + 1 : 1,
   };
-  const cookie = cookies()
-    .set(cookieName, JSON.stringify(newValue))
-    .get(cookieName);
+  const cookie = cookies().set(cookieName, JSON.stringify(newValue)).get(cookieName);
 
   if (!cookie) {
     throw new Error("Could not set cookie");
@@ -49,7 +46,7 @@ export function addToObjectCookie(
 
 export function deleteFromObjectCookie(
   cookieName: string,
-  item: string,
+  item: string
 ): ObjectCookieFunctionReturn {
   const existingValue = getObjectCookie(cookieName);
   if (!existingValue.value) return { name: cookieName, value: null };
@@ -64,9 +61,7 @@ export function deleteFromObjectCookie(
     newValue[item] = decremented;
   }
 
-  const cookie = cookies()
-    .set(cookieName, JSON.stringify(newValue))
-    .get(cookieName);
+  const cookie = cookies().set(cookieName, JSON.stringify(newValue)).get(cookieName);
 
   if (!cookie) {
     throw new Error("Could not delete from existing cookie");
@@ -92,7 +87,7 @@ export function getArrayCookie(cookieName: string): ArrayCookieFunctionReturn {
 export function addToArrayCookie(
   cookieName: string,
   item: string,
-  unshift = false,
+  unshift = false
 ): ArrayCookieFunctionReturn {
   const existingValue = getArrayCookie(cookieName);
   const newValue = [item];
@@ -104,9 +99,7 @@ export function addToArrayCookie(
     }
   }
 
-  const cookie = cookies()
-    .set(cookieName, JSON.stringify(newValue))
-    .get(cookieName);
+  const cookie = cookies().set(cookieName, JSON.stringify(newValue)).get(cookieName);
 
   if (!cookie) {
     throw new Error("Could not set cookie");
@@ -117,7 +110,7 @@ export function addToArrayCookie(
 
 export function deleteFromArrayCookie(
   cookieName: string,
-  item: string,
+  item: string
 ): ArrayCookieFunctionReturn {
   const existingValue = getArrayCookie(cookieName);
   if (!existingValue.value) return { name: cookieName, value: null };
@@ -127,9 +120,7 @@ export function deleteFromArrayCookie(
   if (deletedIndex === -1) return { name: cookieName, value: null };
 
   const newValue = existingValue.value.toSpliced(deletedIndex, 1);
-  const cookie = cookies()
-    .set(cookieName, JSON.stringify(newValue))
-    .get(cookieName);
+  const cookie = cookies().set(cookieName, JSON.stringify(newValue)).get(cookieName);
 
   if (!cookie) {
     throw new Error("Could not delete from existing cookie");
@@ -143,6 +134,12 @@ export const addToCartCookie = (item: string) =>
   addToObjectCookie(CART_COOKIE_NAME, item);
 export const deleteFromCartCookie = (item: string) =>
   deleteFromObjectCookie(CART_COOKIE_NAME, item);
+
+export const getWishlistCookie = () => getObjectCookie(WISHLIST_COOKIE_NAME);
+export const addToWishlistCookie = (item: string) =>
+  addToObjectCookie(WISHLIST_COOKIE_NAME, item);
+export const deleteFromWishlistCookie = (item: string) =>
+  deleteFromObjectCookie(WISHLIST_COOKIE_NAME, item);
 
 export const getViewsCookie = () => getArrayCookie(VIEWS_COOKIE_NAME);
 export const addToViewsCookie = (item: string) => {

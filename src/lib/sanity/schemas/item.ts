@@ -52,8 +52,6 @@ export const itemSchema = defineType({
       name: "views",
       type: "number",
       title: "Views",
-      hidden: true,
-      readOnly: true,
       initialValue: 0,
     }),
     defineField({
@@ -68,8 +66,13 @@ export const itemSchema = defineType({
     defineField({
       name: "content",
       title: "Content",
+      type: "markdown",
+    }),
+    defineField({
+      name: "tags",
+      title: "Tags (filters)",
       type: "array",
-      of: [{ type: "block" }],
+      of: [{ type: "reference", to: [{ type: "tag" }] }],
     }),
   ],
 });

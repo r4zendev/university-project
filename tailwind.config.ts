@@ -6,6 +6,7 @@ export default {
   theme: {
     fontFamily: {
       sans: ["var(--font-supreme)"],
+      mono: ["var(--font-supreme)"],
     },
     container: {
       center: true,
