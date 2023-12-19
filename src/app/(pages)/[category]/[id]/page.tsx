@@ -30,6 +30,10 @@ export default async function Product({
   const { value: viewed } = getViewsCookie();
 
   const product = await getItemById(id);
+  if (!product) {
+    return notFound();
+  }
+
   const productReviews = await getProductReviews(id);
 
   let otherRecommendedProducts: Item[] = [];
@@ -46,9 +50,6 @@ export default async function Product({
     viewedItems = viewed ? await getItems({ ids: viewed }) : [];
   }
 
-  if (!product) {
-    return notFound();
-  }
   const { value: cart } = getCartCookie();
 
   const tagsSelection = product.tags
@@ -159,7 +160,7 @@ export default async function Product({
 
           {viewedItems.length > 0 && (
             <div className="my-4 w-full rounded-xl bg-white px-8 py-4">
-              <h2 className="text-2xl font-semibold text-primary-foreground">
+              <h2 className="text-center text-2xl font-semibold uppercase text-secondary-foreground">
                 Recently viewed
               </h2>
 

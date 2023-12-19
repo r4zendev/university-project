@@ -3,6 +3,9 @@ import { notFound } from "next/navigation";
 import { Section } from "~/components/section";
 import { getPage } from "~/lib/sanity/queries";
 
+// ISR?
+export const revalidate = 60;
+
 export default async function CustomPage({
   params: { slug },
 }: {
