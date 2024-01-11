@@ -1,6 +1,7 @@
 import { type SocialProvider } from "~/lib/types";
 
 export type Category = {
+  _id: string;
   name: string;
   slug: string;
   image: string;
@@ -106,7 +107,7 @@ export type Navigation = NavLink & {
   }[];
 };
 
-export type Section = { _id: string; _createdAt: string } & (
+export type Section = { _id: string; _createdAt: string; ratio?: string } & (
   | { type: "itemlist"; items: Item[] }
   | { type: "text"; text: string }
   | { type: "image"; image: string }
@@ -159,3 +160,18 @@ export type Order = {
   amountPaid: number;
   status: "pending" | "shipped" | "delivered" | "cancelled";
 };
+
+export type Tag = {
+  tagGroup: {
+    required: boolean;
+    name: string;
+  };
+  value: string;
+  badge?: string;
+};
+
+export type SearchedItem = Pick<
+  Item,
+  "name" | "description" | "slug" | "price" | "discountedPrice" | "url" | "images"
+>;
+export type SearchedPage = Pick<Page, "slug">;

@@ -11,6 +11,8 @@ export const env = createEnv({
     SANITY_TOKEN: z.string().optional(),
     RESEND_API_KEY: z.string().optional(),
     STRIPE_SECRET_KEY: z.string(),
+    ADMIN_EMAIL: z.string(),
+    POSTHOG_API_KEY: z.string().optional(),
   },
 
   /**
@@ -25,6 +27,7 @@ export const env = createEnv({
     NEXT_PUBLIC_SANITY_PROJECT_ID: z.string(),
     NEXT_PUBLIC_SANITY_DATASET: z.string(),
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string(),
+    NEXT_PUBLIC_GOOGLE_API_KEY: z.string(),
   },
 
   /**
@@ -39,6 +42,11 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
 
     RESEND_API_KEY: process.env.RESEND_API_KEY,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+
+    POSTHOG_API_KEY: process.env.POSTHOG_API_KEY,
+
+    NEXT_PUBLIC_GOOGLE_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
 
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,

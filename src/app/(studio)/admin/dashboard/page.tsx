@@ -2,7 +2,6 @@ import { getEmails } from "~/lib/sanity/queries";
 import { SendEmail } from "./_components/send-email";
 
 export default async function AdminDashboard() {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
   const emailOptions = await getEmails();
 
   return (

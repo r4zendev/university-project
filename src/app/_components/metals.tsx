@@ -67,7 +67,7 @@ export async function MetalsWidget() {
   const metals = await getMetalsData();
 
   return (
-    <Card>
+    <Card className="mt-4 lg:mt-0">
       <CardContent>
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-primary">Metals</CardTitle>
@@ -79,7 +79,7 @@ export async function MetalsWidget() {
               Object.entries(metals.metals).map(([metal, price]) => (
                 <div key={metal} className="flex justify-between gap-4">
                   <span className="font-semibold">{metalNames[metal]}</span>
-                  <span className="font-medium text-accent">${price}</span>
+                  <span className="font-medium text-accent">${price.toFixed(2)}</span>
                 </div>
               ))
             ) : (

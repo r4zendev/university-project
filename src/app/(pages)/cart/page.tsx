@@ -2,8 +2,7 @@ import { Trash } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
-import { DragFreeItemsCarousel } from "~/components/carousel";
-import { Badge } from "~/components/ui/badge";
+import { DragFreeCarousel } from "~/components/carousels/basic";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent } from "~/components/ui/card";
 import { getItems, getSettings, getTrendingItems } from "~/lib/sanity/queries";
@@ -12,6 +11,7 @@ import { stripeApi } from "~/lib/stripe/client";
 import { formatPrice, formatStripePrice } from "~/lib/utils";
 import { getCartCookie } from "~/lib/utils/cookies";
 import { PaymentElementWrapper } from "./_components/payment-element";
+import { ProductCountButton } from "./_components/product-count-button";
 
 export default async function Cart() {
   const { value: cart } = getCartCookie();
@@ -62,55 +62,74 @@ export default async function Cart() {
 
   return (
     <div>
-      <div className="my-6 flex gap-4">
+      <div className="container my-6 flex flex-col gap-4 md:flex-row">
         <div className="flex-1">
-          <h1 className="mb-4 text-2xl font-semibold">Your Cart</h1>
+          <h1 className="mb-4 text-2xl font-semibold">Confirm your order</h1>
 
           <div className="grid gap-4">
-            {items.map((item) => (
-              <Card key={item._id}>
-                <CardContent className="flex items-start gap-4 p-4">
-                  <Image
-                    alt="Product Image"
-                    className="h-20 w-20 rounded-md object-cover"
-                    width={80}
-                    height={80}
-                    src={item.images[0] ?? "/placeholder.webp"}
-                    style={{
-                      aspectRatio: "80/80",
-                      objectFit: "cover",
-                    }}
-                  />
-                  <div className="grid flex-1 gap-1">
-                    <Link className="text-lg font-medium hover:underline" href="#">
-                      Product Name
-                    </Link>
-                    <p className="text-gray-500">
-                      Quantity: <Badge>2</Badge>
-                    </p>
-                    <p className="text-gray-500">
-                      Price:{" "}
-                      {item.discount ? (
-                        <span className="space-x-2 font-semibold text-primary">
-                          <s className="text-red-400">
-                            {formatPrice(item.price, true)}
-                          </s>
-                          <span>{formatPrice(item.discountedPrice, true)}</span>
-                        </span>
-                      ) : (
-                        <span className="font-semibold text-primary">
-                          {formatPrice(item.price, true)}
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <Button className="w-12" variant="destructive">
-                    <Trash className="h-4 w-4" />
-                    <span className="sr-only">Remove item</span>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+            {Object.entries(cart).map(([cookieTag, itemAmount]) => {
+              const item = items.find(
+                (item) => item._id === cookieTag.split("(")[0]?.trim()
+              );
+
+              if (!item) {
+                return null;
+              }
+
+              const itemModifiers = "(" + cookieTag.split("(", 2).at(-1);
+
+              return (
+                <Card key={item._id}>
+                  <CardContent className="flex h-full justify-between gap-4 p-4 sm:items-start">
+                    <div className="space-y-4">
+                      <Image
+                        alt="Product Image"
+                        className="h-20 w-20 rounded-md object-cover"
+                        width={80}
+                        height={80}
+                        src={item.images[0] ?? "/placeholder.webp"}
+                        style={{
+                          aspectRatio: "80/80",
+                          objectFit: "cover",
+                        }}
+                      />
+                      <div className="grid flex-1 gap-1">
+                        <Link className="text-lg font-medium hover:underline" href="#">
+                          {item.name} {itemModifiers}
+                        </Link>
+
+                        <p className="text-gray-500">
+                          Price:{" "}
+                          {item.discount && item.discountedPrice ? (
+                            <span className="space-x-2 font-semibold text-primary">
+                              <s className="text-red-400">
+                                {formatPrice(item.price * itemAmount, true)}
+                              </s>
+                              <span>
+                                {formatPrice(item.discountedPrice * itemAmount, true)}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="font-semibold text-primary">
+                              {formatPrice(item.price * itemAmount, true)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex h-full flex-col-reverse items-end justify-between">
+                      <ProductCountButton cart={cart} tag={cookieTag} />
+
+                      <Button className="w-12" variant="destructive">
+                        <Trash className="h-4 w-4" />
+                        <span className="sr-only">Remove item</span>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         </div>
 
@@ -118,6 +137,8 @@ export default async function Cart() {
           clientSecret={clientSecret}
           settings={settings}
           amount={formatStripePrice(stripeAmount)}
+          cartItems={items}
+          cart={cart}
         />
       </div>
 
@@ -128,7 +149,7 @@ export default async function Cart() {
               You may also like
             </h4>
 
-            <DragFreeItemsCarousel slides={otherRecommendedProducts} />
+            <DragFreeCarousel items={otherRecommendedProducts} />
           </div>
         )}
       </div>

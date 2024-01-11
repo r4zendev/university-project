@@ -13,9 +13,11 @@ export const SubscribeNewsletter = () => {
 
   return (
     <div role="form" className="space-y-4 border-y py-12 text-center">
-      <h5 className="font-mono text-3xl uppercase">Subscribe to our newsletter</h5>
+      <h5 className="font-mono text-xl uppercase lg:text-3xl">
+        Subscribe to our newsletter
+      </h5>
 
-      <div className="mx-auto flex w-1/3">
+      <div className="mx-auto flex w-4/5 md:w-2/3 lg:w-1/3">
         <Input
           className="rounded-r-none border-r-0 transition-colors focus-visible:border-gray-800 focus-visible:ring-0"
           placeholder="Enter your email"

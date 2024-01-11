@@ -34,7 +34,6 @@ export const emailSchema = defineType({
       title: "Link",
       type: "string",
       description: "Add a call to action to your email.",
-      validation: (Rule) => Rule.regex(/^\/([^\/\s]+\/?)*$/),
     }),
   ],
 });

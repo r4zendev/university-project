@@ -7,6 +7,7 @@ import {
   GET_ALL_CATEGORIES_TAG,
   GET_ALL_ITEMS_TAG,
   GET_ALL_ORDERS_TAG,
+  GET_ALL_TAGS_TAG,
   GET_BANNER_IMAGE_TAG,
   GET_COLLECTIONS_TAG,
   GET_EMAIL_TEMPLATES_TAG,
@@ -35,9 +36,12 @@ import type {
   Order,
   Page,
   Review,
+  SearchedItem,
+  SearchedPage,
   Settings,
   SliderBanner,
   SocialLink,
+  Tag,
   TopBanner,
 } from "./types";
 
@@ -69,6 +73,7 @@ const itemQueryFields = `
   price,
   discount,
   featured,
+  "url": "/" + category->slug.current + "/" + _id,
   "images": images[].asset->url,
   "discountedPrice": price * (1 - discount / 100),
   "category": category->{
@@ -82,6 +87,10 @@ const itemQueryFields = `
     value,
     "badge": badge.asset->url,
   },
+  "collection": collection->{
+    name,
+    "slug": slug.current,
+  },
   views,
   content
 `;
@@ -91,7 +100,9 @@ const sectionQuery = `
   _createdAt,
   type,
   text,
+  ratio,
   "image": image.asset->url,
+  "images": images[].asset->url,
   textStyle,
   "items": items[]->{
     ${itemQueryFields}
@@ -279,6 +290,7 @@ export async function getCategories(): Promise<Category[]> {
   try {
     return await sanityFetch({
       query: groq`*[_type == "category"] {
+        _id,
         name,
         "slug": slug.current,
         "image": image.asset->url,
@@ -439,15 +451,7 @@ export async function getPage(slug: string): Promise<Page | null> {
         _createdAt,
         slug,
         sections[]->{
-          _id,
-          _createdAt,
-          type,
-          items[]->{
-            ${itemQueryFields}
-          },
-          text,
-          "image": image.asset->url,
-          textStyle
+          ${sectionQuery}
         }
       }`,
       params: { slug },
@@ -501,6 +505,20 @@ export async function getUnactedInquiries(): Promise<Inquiry[]> {
   }
 }
 
+export async function createOrder(data: Omit<Order, "status">): Promise<Order> {
+  try {
+    return await sanityClient.create({
+      _type: "order",
+      ...data,
+      status: "pending",
+    } as const);
+  } catch (err) {
+    logger.error({ err }, "Error creating an order");
+    console.error(err);
+    return {} as Order;
+  }
+}
+
 export async function getAllOrders(): Promise<Order[]> {
   try {
     return await sanityFetch({
@@ -551,14 +569,11 @@ export async function getCollections(): Promise<Collection[]> {
         _id,
         _createdAt,
         name,
-        slug,
+        "slug": slug.current,
         description,
         sections[]->{
           ${sectionQuery}
         },
-        items[]->{
-          ${itemQueryFields}
-        }
       }`,
       tags: [GET_COLLECTIONS_TAG],
     });
@@ -581,9 +596,6 @@ export async function getCollection(slug: string): Promise<Collection | null> {
         sections[]->{
           ${sectionQuery}
         },
-        items[]->{
-          ${itemQueryFields}
-        }
       }`,
       params: { slug },
       tags: [GET_COLLECTIONS_TAG],
@@ -591,5 +603,68 @@ export async function getCollection(slug: string): Promise<Collection | null> {
   } catch (err) {
     logger.error({ err }, "Error fetching collection");
     return null;
+  }
+}
+
+export async function getAllTags(group?: string): Promise<Tag[]> {
+  try {
+    return await sanityFetch({
+      query: groq`
+      *[_type == "tag"${group ? ` && tagGroup->name == $group` : ""}]{
+        _id,
+        _createdAt,
+        value,
+        "image": badge.asset->url,
+        "tagGroup": tagGroup->{
+          name,
+          required,
+        },
+      }`,
+      params: { group },
+      tags: [GET_ALL_TAGS_TAG],
+    });
+  } catch (err) {
+    logger.error({ err }, "Error fetching collection");
+    return [];
+  }
+}
+
+export async function getSearchQuery(query: string): Promise<{
+  items: SearchedItem[];
+  pages: SearchedPage[];
+}> {
+  try {
+    const items: SearchedItem[] = await sanityFetch({
+      query: groq`
+      *[_type == "item" && name match "${query}*"]{
+        _id,
+        _createdAt,
+        name,
+        description,
+        "slug": slug.current,
+        "images": images[].asset->url,
+        price,
+        "discountedPrice": price * (1 - discount / 100),
+        "url": "/" + category->slug.current + "/" + _id,
+      }`,
+      params: { query },
+      tags: [GET_ALL_TAGS_TAG],
+    });
+
+    const pages: SearchedPage[] = await sanityFetch({
+      query: groq`
+      *[_type == "page" && slug match "${query}*"]{
+        _id,
+        _createdAt,
+        slug,
+      }`,
+      params: { query },
+      tags: [GET_ALL_TAGS_TAG],
+    });
+
+    return { items, pages };
+  } catch (err) {
+    logger.error({ err }, "Error fetching collection");
+    return { items: [], pages: [] };
   }
 }

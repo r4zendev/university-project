@@ -1,4 +1,12 @@
-import { getItems } from "~/lib/sanity/queries";
+import { Trash } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
+import { DragFreeCarousel } from "~/components/carousels/basic";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent } from "~/components/ui/card";
+import { getItems, getSettings, getTrendingItems } from "~/lib/sanity/queries";
+import type { Item } from "~/lib/sanity/types";
 import { getWishlistCookie } from "~/lib/utils/cookies";
 
 export default async function Wishlist() {
@@ -8,27 +16,61 @@ export default async function Wishlist() {
     ids: Object.keys(wishlist).map((key) => key.split(" ")[0]!),
   });
 
+  const settings = await getSettings();
+
+  let otherRecommendedProducts: Item[] = [];
+  if (settings) {
+    if (settings.enableForYou) {
+      otherRecommendedProducts = await getTrendingItems();
+    }
+  } else {
+    otherRecommendedProducts = await getTrendingItems();
+  }
+
   return (
-    <div>
+    <div className="container my-4 grid gap-4">
       {items.map((item) => {
         return (
-          <div key={`item-${item.name}`} className="xl:container">
-            <p>{item.name}</p>
-            <p>
-              {item.discount ? (
-                <span className="space-x-2 font-semibold text-primary">
-                  <s className="text-red-400">{item.price}</s>
-                  <span>{item.price}</span>
-                </span>
-              ) : (
-                item.price
-              )}
-            </p>
-            <p>{item.description}</p>
-            <p>Quantity: {wishlist[item._id]}</p>
-          </div>
+          <Card key={item._id}>
+            <CardContent className="flex items-center justify-between p-4">
+              <Link href={item.url} className="flex items-start gap-4">
+                <Image
+                  alt="Product Image"
+                  className="h-20 w-20 rounded-md object-cover"
+                  width={80}
+                  height={80}
+                  src={item.images[0] ?? "/placeholder.webp"}
+                  style={{
+                    aspectRatio: "80/80",
+                    objectFit: "cover",
+                  }}
+                />
+                <div className="grid flex-1 gap-1">
+                  <span className="text-lg font-medium">{item.name}</span>
+                  <span className="text-md">{item.description}</span>
+                </div>
+              </Link>
+
+              <Button className="w-12" variant="destructive">
+                <Trash className="h-4 w-4" />
+                <span className="sr-only">Remove item</span>
+              </Button>
+            </CardContent>
+          </Card>
         );
       })}
+
+      <div className="mx-auto w-3/4">
+        {otherRecommendedProducts.length > 0 && (
+          <div className="mt-4 flex w-full flex-col items-center justify-center">
+            <h4 className="text-2xl font-bold uppercase tracking-tight">
+              You may also like
+            </h4>
+
+            <DragFreeCarousel items={otherRecommendedProducts} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

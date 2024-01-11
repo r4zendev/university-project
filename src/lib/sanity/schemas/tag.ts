@@ -20,6 +20,14 @@ export const tagGroupSchema = defineType({
       type: "boolean",
       initialValue: false,
     }),
+    // defineField({
+    //   name: "transparent",
+    //   title: "Transparent",
+    //   description:
+    //     "Determines if this tag group is showed anywhere or is it just for filtering purposes.",
+    //   type: "boolean",
+    //   initialValue: false,
+    // }),
   ],
 });
 

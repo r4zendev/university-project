@@ -17,8 +17,6 @@ export const subscribeToNewsLetter = async (email: string) => {
         },
       });
 
-      console.log(user);
-
       return { message: "OK" as const };
     } catch (err) {
       console.dir(err, { depth: 100 });
@@ -41,12 +39,10 @@ export const subscribeToNewsLetter = async (email: string) => {
     })
   );
 
-  const isAlreadySubbed = result.some((subResult) => {
-    console.log(subResult);
-    return (
+  const isAlreadySubbed = result.some(
+    (subResult) =>
       subResult.status === "fulfilled" && subResult.value.message === "ALREADY_SUBBED"
-    );
-  });
+  );
 
   if (isAlreadySubbed) {
     return { message: "ALREADY_SUBBED" as const };

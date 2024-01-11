@@ -7,12 +7,12 @@ import {
   Twitter,
   Youtube,
 } from "lucide-react";
-import { marked } from "marked";
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { type ReactNode } from "react";
 
-import { SimpleTextCarousel } from "~/components/carousel";
+import { HeaderCarousel } from "~/components/carousels/header";
 import { MetalsWidget } from "~/components/metals";
 import {
   getNavLinks,
@@ -29,7 +29,7 @@ import { Search } from "./_components/search";
 
 import "~/styles/globals.css";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Silverstone | Front Page",
   description: "Buy the best jewelry in the world",
   icons: [
@@ -109,17 +109,7 @@ export default async function MainLayout({
   return (
     <div>
       <header className="border-b">
-        {topScrollTexts.length > 0 && (
-          <SimpleTextCarousel
-            slides={topScrollTexts.map((item) => (
-              <div
-                className="border-b bg-primary py-0.5 text-center text-primary-foreground"
-                key={item._id}
-                dangerouslySetInnerHTML={{ __html: marked.parse(item.text) }}
-              />
-            ))}
-          />
-        )}
+        {topScrollTexts.length > 0 && <HeaderCarousel items={topScrollTexts} />}
 
         <div className="flex h-16 items-center px-4">
           <Link href="/">
@@ -154,7 +144,7 @@ export default async function MainLayout({
 
       <ProductsNavigation links={productsNavLinks} />
 
-      <main className="container max-w-7xl">
+      <main>
         {modal}
 
         {children}
@@ -168,12 +158,12 @@ export default async function MainLayout({
         <SubscribeNewsletter />
 
         <div className="mx-auto px-6 pb-8 pt-4 sm:pt-8">
-          <div className="flex gap-8">
-            <div className="flex flex-1 justify-between gap-8">
+          <div className="gap-8 lg:flex">
+            <div className="flex flex-1 flex-wrap justify-between gap-8 md:flex-nowrap">
               {footerNavLinks.map(({ title, subnav }) => (
-                <div key={title} className="w-full">
+                <div key={title} className="flex w-full justify-between">
                   {subnav.map((subNav) => (
-                    <div key={subNav.title} className="min-w-[10rem]">
+                    <div key={subNav.title} className="inline-block lg:min-w-[10rem]">
                       <p className="mb-2 mt-5 font-bold">{subNav.title}</p>
 
                       {subNav.links.map((subLink) => (

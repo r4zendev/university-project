@@ -74,11 +74,11 @@ export const sectionSchema = defineType({
       options: { hotspot: true },
       fields: [{ name: "alt", title: "Alt", type: "string" }],
       hidden: ({ document }) =>
-        !["text", "image", "image-with-text"].includes(document?.type as string),
+        !["image", "image-with-text"].includes(document?.type as string),
       validation: (rule) =>
         rule.custom((currentValue, { document }) => {
           if (
-            ["text", "image", "image-with-text"].includes(document?.type as string) &&
+            ["image", "image-with-text"].includes(document?.type as string) &&
             currentValue === undefined
           ) {
             return "This is required with currently used section type";
@@ -107,6 +107,12 @@ export const sectionSchema = defineType({
 
           return true;
         }),
+    }),
+    defineField({
+      name: "ratio",
+      title: "Ratio",
+      type: "string",
+      description: "Specify the ratio as x / y. For example 16 / 9",
     }),
   ],
 });

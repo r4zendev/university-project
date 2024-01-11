@@ -5,9 +5,9 @@ import { Card, CardContent } from "~/components/ui/card";
 import type { Category, Item } from "~/lib/sanity/types";
 import { cn } from "~/lib/utils";
 
-export type MinimumAcceptableItem = Pick<Item, "images" | "name" | "_id"> & {
+export type MinimumAcceptableItem = Pick<Item, "name" | "_id"> & {
   category: { slug: Item["category"]["slug"] };
-};
+} & (Pick<Item, "images"> | Pick<Category, "image">);
 
 const ContentCard = ({
   item,
@@ -28,7 +28,7 @@ const ContentCard = ({
         )}
       />
 
-      <span className="absolute bottom-0 left-1/2 translate-x-[-50%] text-lg">
+      <span className="absolute bottom-0 left-1/2 translate-x-[-50%] whitespace-nowrap text-sm font-medium md:text-lg">
         {item.name}
       </span>
     </CardContent>
@@ -45,11 +45,14 @@ export function ListItem({
   return (
     <Link
       href={`/${item.category.slug}/${item._id}`}
-      className={"w-[16rem] shrink-0 overflow-hidden rounded-md"}
+      className="w-full shrink-0 overflow-hidden rounded-md"
     >
       <ContentCard
         className={className}
-        item={{ name: item.name, image: item.images[0] }}
+        item={{
+          name: item.name,
+          image: "images" in item ? item.images.at(0) : item.image,
+        }}
       />
     </Link>
   );
@@ -59,7 +62,7 @@ export function CategoryItem({ category }: { category: Category }) {
   return (
     <Link
       href={`/${category.slug}`}
-      className="w-[16rem] shrink-0 overflow-hidden rounded-md"
+      className="w-full shrink-0 overflow-hidden rounded-md"
     >
       <ContentCard item={category} />
     </Link>

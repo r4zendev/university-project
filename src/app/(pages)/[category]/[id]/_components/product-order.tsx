@@ -32,7 +32,7 @@ const SelectOptions = ({
             <Button
               variant="secondary"
               className={cn(
-                "w-14 font-medium",
+                "h-6 w-8 font-medium lg:h-10 lg:w-12",
                 selected[tagName] === value &&
                   "bg-accent text-accent-foreground hover:bg-accent/80"
               )}
@@ -114,7 +114,6 @@ type OrderItemProps = {
 export const OrderButton = ({
   id,
   cart,
-  tags,
   disabled,
   className,
 }: { className?: string; disabled?: boolean } & OrderItemProps) => {

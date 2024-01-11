@@ -61,12 +61,13 @@ export const itemSchema = defineType({
       description:
         "Add images to show in the gallery. First image will be used as the main image.",
       of: [{ type: "image", options: { hotspot: true } }],
-      initialValue: [],
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: "content",
-      title: "Content",
-      type: "markdown",
+      name: "collection",
+      title: "Collection",
+      type: "reference",
+      to: [{ type: "collection" as const }],
     }),
     defineField({
       name: "tags",

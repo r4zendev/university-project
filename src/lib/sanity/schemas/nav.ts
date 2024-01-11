@@ -15,9 +15,8 @@ export const navLinkSchema = defineType({
       name: "link",
       title: "Link",
       description:
-        "Links should be specified relative to main domain of the website. For example: /about",
+        "Links can be specified relative to main domain of the website. For example: /about. You can use absolute links too.",
       type: "string",
-      validation: (Rule) => Rule.regex(/^\/([^\/\s]+\/?)*$/),
     }),
   ],
 });

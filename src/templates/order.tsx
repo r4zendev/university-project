@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Font,
   Head,
@@ -11,22 +10,20 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import { marked } from "marked";
+import { Check } from "lucide-react";
 
-import type { Email } from "~/lib/sanity/types";
+import { Card, CardContent } from "~/components/ui/card";
+import type { createOrder } from "~/lib/sanity/queries";
+import { formatPrice } from "~/lib/utils";
 
-export type StandardTemplateProps = Email & {
-  name: string | null;
-  productName: string;
-};
-
-export function EmailTemplate({
+export function OrderTemplate({
+  address,
+  amountPaid,
   content,
-  link,
-  subject,
-  name,
   productName,
-}: StandardTemplateProps) {
+}: Omit<Parameters<typeof createOrder>[0], "email"> & {
+  productName: string;
+}) {
   return (
     <Html lang="en">
       <Tailwind
@@ -64,34 +61,46 @@ export function EmailTemplate({
           />
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <title>{subject}</title>
+          <title>Order placed</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <style type="text/css"></style>
         </Head>
 
         {/* <MailContent {...props} /> */}
-        <Preview>{subject}</Preview>
+        <Preview>Order placed! Thank you</Preview>
 
         <Body className="bg-gray-200 pt-12">
           <Container className="border-y-2 border-solid border-gray-400 bg-white px-6">
-            <Heading>{subject}</Heading>
+            <Heading>Order placed!</Heading>
 
-            <Text>Hey{name ? `, ${name}` : " there"}!</Text>
+            <Text>Hello, dear customer!</Text>
 
             <Section>
-              <div dangerouslySetInnerHTML={{ __html: marked.parse(content) }} />
+              <main className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4 md:p-8">
+                <Card className="w-full max-w-lg">
+                  <CardContent className="text-center">
+                    <Check className="mx-auto mb-4 h-12 w-12 text-green-500" />
+                    <p className="mb-4">
+                      Thank you for your purchase! Your order has been successfully
+                      processed.
+                    </p>
+                    <h2 className="mb-2 text-lg font-semibold">Order Details</h2>
+                    <div className="mb-1 flex justify-between">
+                      <span>Total Amount: </span>
+                      <span className="font-medium">{formatPrice(amountPaid)}</span>
+                    </div>
+                    <div className="mb-4 flex justify-between">
+                      <span>It will be shipped to: </span>
+                      <span className="font-medium">{address}</span>
+                    </div>
+                    <div className="mb-4 flex justify-between text-left">
+                      <span>Items you have ordered: </span>
+                      <div>{content}</div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </main>
             </Section>
-
-            {link && (
-              <Section className="text-center">
-                <Button
-                  href={link}
-                  className="mx-auto my-6 rounded-lg bg-primary px-8 py-3 text-center text-lg text-primary-foreground"
-                >
-                  Go to {productName}
-                </Button>
-              </Section>
-            )}
           </Container>
 
           <Text className="my-8 text-center text-slate-500">

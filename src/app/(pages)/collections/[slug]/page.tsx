@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { DragFreeItemsCarousel } from "~/components/carousel";
+import { DragFreeCarousel } from "~/components/carousels/basic";
 import { Section } from "~/components/section";
 import { getCollection } from "~/lib/sanity/queries";
 
@@ -15,8 +15,6 @@ export default async function CollectionPage({
     return notFound();
   }
 
-  console.log(collection);
-
   return (
     <div className="w-full">
       <div className="w-full">
@@ -25,7 +23,7 @@ export default async function CollectionPage({
         ))}
       </div>
 
-      <DragFreeItemsCarousel slides={collection.items} />
+      <DragFreeCarousel items={collection.items} />
     </div>
   );
 }

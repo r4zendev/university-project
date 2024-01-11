@@ -4,8 +4,9 @@ import { clerkClient } from "@clerk/nextjs";
 import { Resend } from "resend";
 
 import { env } from "~/env.mjs";
-import { getSettings } from "~/lib/sanity/queries";
+import { getSettings, type createOrder } from "~/lib/sanity/queries";
 import { type Email } from "~/lib/sanity/types";
+import { OrderTemplate } from "~/templates/order";
 import { EmailTemplate } from "~/templates/standard";
 
 export async function sendNewsletter(props: Email & { host: string }) {
@@ -88,5 +89,52 @@ export async function sendNewsletter(props: Email & { host: string }) {
   } catch (err) {
     console.error(err);
     return new Response((err as Error).message, { status: 500 });
+  }
+}
+
+export async function sendOrderConfirmed(
+  props: Parameters<typeof createOrder>[0] & { email: string; host: string }
+) {
+  if (!env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is not defined");
+  }
+
+  const settings = await getSettings();
+
+  if (!settings) {
+    throw new Error("Please add settings to Sanity.");
+  }
+
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  const { email, host, ...orderData } = props;
+
+  const from =
+    env.NODE_ENV === "development"
+      ? "Development <noreply@r4zen.dev>"
+      : `Newsletter <noreply@${host}>`;
+
+  try {
+    await resend.emails.send({
+      from: from ?? "noreply@jewellery.dev",
+      to: email,
+      subject: "Order confirmed",
+      react: OrderTemplate({ ...orderData, productName: settings.productName }),
+    });
+  } catch (err) {
+    console.error(err);
+    // return new Response((err as Error).message, { status: 500 });
+  }
+
+  try {
+    await resend.emails.send({
+      from: from ?? "noreply@jewellery.dev",
+      to: env.ADMIN_EMAIL,
+      subject: "New order by a customer",
+      react: OrderTemplate({ ...orderData, productName: settings.productName }),
+    });
+  } catch (err) {
+    console.error(err);
+    // return new Response((err as Error).message, { status: 500 });
   }
 }

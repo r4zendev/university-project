@@ -15,14 +15,6 @@ import type { Navigation } from "~/lib/sanity/types";
 import { cn } from "~/lib/utils";
 
 export const ProductsNavigation = ({ links }: { links: Navigation[] }) => {
-  //   <NavigationMenuItem>
-  //   <Link href="/docs" legacyBehavior passHref>
-  //     <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-  //       Documentation
-  //     </NavigationMenuLink>
-  //   </Link>
-  // </NavigationMenuItem>
-
   return (
     <div className="border-b border-secondary">
       <div className="container">
@@ -30,15 +22,15 @@ export const ProductsNavigation = ({ links }: { links: Navigation[] }) => {
           <NavigationMenuList>
             {links.map(({ link, title, subnav }) => (
               <NavigationMenuItem key={title}>
-                <Link href={link}>
-                  <NavigationMenuTrigger className="hover:underline">
+                <NavigationMenuTrigger className="hover:underline">
+                  <Link href={link} className="pr-2">
                     {title}
-                  </NavigationMenuTrigger>
-                </Link>
-                <NavigationMenuContent className="p-4 flex gap-2">
+                  </Link>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="flex gap-2 p-4">
                   {subnav.map((subNav) => (
                     <div key={subNav.title} className="min-w-[10rem]">
-                      <p className="font-bold mb-3">{subNav.title}</p>
+                      <p className="mb-3 font-bold">{subNav.title}</p>
                       {subNav.links.map((subLink) => (
                         <ul key={subLink.link}>
                           <ListItem href={subLink.link} title={subLink.title} />
@@ -66,8 +58,8 @@ const ListItem = React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "inline-block relative select-none space-y-1 leading-none outline-none transition-colors hover:text-accent focus:bg-accent focus:text-accent-foreground after:w-0 after:h-0.5 after:absolute after:bottom-0 after:left-0 after:bg-accent after:transition-all after:duration-300 after:ease-in-out hover:after:w-full",
-            className,
+            "relative inline-block select-none space-y-1 leading-none outline-none transition-colors after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-accent after:transition-all after:duration-300 after:ease-in-out hover:text-accent hover:after:w-full focus:bg-accent focus:text-accent-foreground",
+            className
           )}
           {...props}
         >

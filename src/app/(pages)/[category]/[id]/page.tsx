@@ -1,12 +1,10 @@
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
-import { formatDistance } from "date-fns";
-import { Star } from "lucide-react";
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 
-import { DragFreeItemsCarousel } from "~/components/carousel";
 import { ListItem } from "~/components/list-item";
 import { Button } from "~/components/ui/button";
+import { Carousel, CarouselContent, CarouselItem } from "~/components/ui/carousel";
 import {
   getItemById,
   getItems,
@@ -15,10 +13,10 @@ import {
   getTrendingItems,
 } from "~/lib/sanity/queries";
 import type { Item } from "~/lib/sanity/types";
-import { cn } from "~/lib/utils";
 import { getCartCookie, getViewsCookie } from "~/lib/utils/cookies";
 import { ProductOrder } from "./_components/product-order";
 import { ReviewForm } from "./_components/review-form";
+import { PaginatedReviews } from "./_components/reviews";
 import { ViewsIncrementer } from "./_components/views-incrementer";
 
 export default async function Product({
@@ -31,7 +29,7 @@ export default async function Product({
 
   const product = await getItemById(id);
   if (!product) {
-    return notFound();
+    return redirect("/");
   }
 
   const productReviews = await getProductReviews(id);
@@ -67,25 +65,27 @@ export default async function Product({
     : {};
 
   return (
-    <>
+    <div>
       <ViewsIncrementer id={id} />
 
-      <div className="mt-2 flex flex-col gap-4">
+      <div className="mt-2 flex flex-col gap-4 p-1 lg:container">
         {/* Banners */}
 
         <div className="flex gap-4">
-          <div className="grid flex-1 grid-cols-2 gap-6">
-            {product.images[0] && (
-              <Image
-                src={product.images[0]}
-                alt={product.name ?? "Item"}
-                width={500}
-                height={500}
-              />
-            )}
+          <div className="basic-1/2 grid grid-cols-1 gap-6 lg:w-auto lg:flex-1 lg:grid-cols-2">
+            {product.images?.length &&
+              product.images.map((img) => (
+                <Image
+                  key={img}
+                  src={img}
+                  alt={product.name ?? "Item"}
+                  width={500}
+                  height={500}
+                />
+              ))}
           </div>
 
-          <div className="shrink-0 basis-1/4">
+          <div className="shrink-0 basis-1/2 lg:basis-1/4">
             <h4 className="text-3xl font-bold tracking-tight">{product.name}</h4>
 
             <ProductOrder id={id} cart={cart} product={product} tags={tagsSelection} />
@@ -98,7 +98,15 @@ export default async function Product({
               You may also like
             </h4>
 
-            <DragFreeItemsCarousel slides={otherRecommendedProducts} />
+            <Carousel>
+              <CarouselContent>
+                {otherRecommendedProducts.map((item) => (
+                  <CarouselItem className="md:basis-1/2 lg:basis-1/3" key={item._id}>
+                    <ListItem item={item} />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
           </div>
         )}
 
@@ -121,35 +129,7 @@ export default async function Product({
 
           <div className="flex w-full flex-col gap-4 divide-y">
             {productReviews.length ? (
-              productReviews.map((review) => (
-                <div key={review._id} className="flex flex-col gap-2 pt-6">
-                  <div className="flex items-center gap-2 text-sm">
-                    <div className="flex">
-                      {Array.from({ length: review.rating })
-                        .concat(
-                          Array.from({ length: 5 - review.rating }).fill("unfilled")
-                        )
-                        .map((check, i) => (
-                          <Star
-                            key={i}
-                            className={cn(
-                              "h-4 w-4",
-                              check !== "unfilled" && "fill-yellow-500 text-yellow-500"
-                            )}
-                          />
-                        ))}
-                    </div>
-                    <p className="font-medium">{review.username ?? review.email}</p>
-                    <p>
-                      {formatDistance(new Date(review._createdAt), new Date(), {
-                        addSuffix: true,
-                      })}
-                    </p>
-                  </div>
-                  <p className="text-md font-semibold">{review.title}</p>
-                  <p className="text-lg">{review.content}</p>
-                </div>
-              ))
+              <PaginatedReviews reviews={productReviews} />
             ) : (
               <div className="my-8 text-center">
                 <p className="text-semibold text-xl">No reviews yet</p>
@@ -164,15 +144,19 @@ export default async function Product({
                 Recently viewed
               </h2>
 
-              <div className="mt-4 flex items-center justify-center gap-4">
-                {viewedItems.map((item) => (
-                  <ListItem key={item.name} item={item} />
-                ))}
-              </div>
+              <Carousel>
+                <CarouselContent className="justify-center">
+                  {viewedItems.map((item) => (
+                    <CarouselItem className="md:basis-1/2 lg:basis-1/3" key={item._id}>
+                      <ListItem item={item} />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 }

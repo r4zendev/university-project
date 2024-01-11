@@ -1,4 +1,4 @@
-import { getItems, type ItemSortOptions } from "~/lib/sanity/queries";
+import { getAllTags, getItems, type ItemSortOptions } from "~/lib/sanity/queries";
 import { ProductsWithFilter } from "./_components/products";
 import type { TagsWithCounts } from "./_components/types";
 
@@ -14,25 +14,57 @@ export default async function ProductsPage({
     string,
     string[]
   >;
+  const priceTags = await getAllTags("Price");
+  const parsedPriceRanges = priceTags
+    .reduce(
+      (acc, tag) => [
+        ...acc,
+        tag.value.split("-").map((n) => Number(n.match(/[0-9]+/)?.at(0))),
+      ],
+      [] as number[][]
+    )
+    .filter(([a, b]) => a !== undefined && b !== undefined)
+    .sort((a, b) => a[0]! - b[0]!);
 
   const products = await getItems({
     category,
-    // ...(filter && { tags: parsedFilters }),
     ...(sort && { sort: sort as ItemSortOptions }),
   });
 
-  const matchedPairs: { name: string; value: string }[] = [];
   const tagsWithCounts = products.reduce((acc, product) => {
+    const productPrice = product.discountedPrice ?? product.price;
+    const priceRange = parsedPriceRanges.find(
+      ([min, max]) => productPrice >= min! && productPrice <= max!
+    );
+
+    const priceTag = priceTags.find((tag) =>
+      tag.value.includes(`${priceRange?.[0]}-${priceRange?.[1]}`)
+    );
+
+    if (priceTag?.value) {
+      if (!product.tags) {
+        product.tags = [];
+      }
+      product.tags?.push({
+        name: "Price",
+        value: priceTag.value,
+      } as NonNullable<(typeof product)["tags"]>[number]);
+    }
+
     product.tags?.forEach((tag) => {
       const { name, ...tagRest } = tag;
-      if (
-        acc[name] &&
-        !matchedPairs.find((pair) => pair.name === name && pair.value === tagRest.value)
-      ) {
-        acc[name]!.push(tagRest);
+
+      const restData = { ...tagRest, count: 1 };
+      if (acc[name]) {
+        const existing = acc[name]!.find((t) => t.value === tagRest.value);
+        if (existing) {
+          existing.count++;
+          return acc;
+        }
+
+        acc[name]!.push(restData);
       } else {
-        matchedPairs.push({ name, value: tagRest.value });
-        acc[name] = [tagRest];
+        acc[name] = [restData];
       }
     });
 
@@ -57,7 +89,12 @@ export default async function ProductsPage({
       : products;
 
   return (
-    // Banners
-    <ProductsWithFilter products={filteredProducts} tags={tagsWithCounts} />
+    // TODO: Banners
+
+    <ProductsWithFilter
+      category={category}
+      products={filteredProducts}
+      tags={tagsWithCounts}
+    />
   );
 }

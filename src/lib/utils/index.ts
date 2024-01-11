@@ -21,3 +21,7 @@ export const formatStripePrice = (price: number) => {
   const [dollars, cents] = amount.toString().split(".");
   return `${dollars}.${cents!.padEnd(2, "0")}`;
 };
+
+export const capitalize = (str: string) => {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};

@@ -80,7 +80,7 @@ export const ReviewForm = ({ id }: { id: string }) => {
         </Button>
       </DialogTrigger>
 
-      <DialogContent>
+      <DialogContent className="w-5/6">
         <Form {...form}>
           <form
             // action={(formData) => {
@@ -89,7 +89,7 @@ export const ReviewForm = ({ id }: { id: string }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-4"
           >
-            <div className="flex items-center justify-between gap-8">
+            <div className="flex items-start justify-between gap-8">
               <FormField
                 control={form.control}
                 name="title"
@@ -111,9 +111,9 @@ export const ReviewForm = ({ id }: { id: string }) => {
                   <FormItem>
                     <FormLabel required>Your rating</FormLabel>
                     <FormControl>
-                      <ul className="my-1 flex list-none gap-1 p-0">
+                      <ul className="my-1 flex list-none gap-1 pr-8">
                         <input hidden {...field} />
-                        <div className="flex flex-row-reverse justify-center p-10">
+                        <div className="flex flex-row-reverse justify-center">
                           {Array.from(Array(5)).map((_, i) => (
                             <Star
                               key={i}

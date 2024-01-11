@@ -1,4 +1,5 @@
 import { ClerkProvider } from "@clerk/nextjs";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 
 import { Toaster } from "~/app/_components/ui/toaster";
@@ -23,7 +24,12 @@ const supreme = localFont({
   variable: "--font-supreme",
 });
 
-export const metadata = {
+export const viewport: Viewport = {
+  initialScale: 1,
+  maximumScale: 1,
+  width: "device-width",
+};
+export const metadata: Metadata = {
   title: "Silverstone | Front Page",
   description: "Buy the best jewelry in the world",
   icons: [
@@ -32,11 +38,7 @@ export const metadata = {
   ],
 };
 
-export default function EmptyLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function EmptyLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={`font-sans ${supreme.variable} bg-white`}>

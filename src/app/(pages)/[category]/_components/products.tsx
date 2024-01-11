@@ -3,7 +3,7 @@
 import { ArrowUpDownIcon } from "lucide-react";
 import { parseAsJson, parseAsString, useQueryState } from "next-usequerystate";
 import Image from "next/image";
-import { useTransition, type TransitionStartFunction } from "react";
+import { useState, useTransition, type TransitionStartFunction } from "react";
 
 import { ListItem } from "~/components/list-item";
 import {
@@ -22,6 +22,14 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { Label } from "~/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "~/components/ui/pagination";
 import type { Item } from "~/lib/sanity/types";
 import { cn } from "~/lib/utils";
 import type { TagsWithCounts } from "./types";
@@ -43,9 +51,8 @@ export const ItemsFilter = ({
       <h2 className="text-lg font-semibold">Filter by:</h2>
       <Accordion
         className="w-full"
-        collapsible
-        type="single"
-        defaultValue={Object.keys(namedTags)[0]}
+        type="multiple"
+        defaultValue={Object.keys(namedTags)}
       >
         {Object.entries(namedTags).map(([name, tags]) => (
           <AccordionItem key={`${name}-filter`} value={name}>
@@ -101,7 +108,7 @@ export const ItemsFilter = ({
                   {tag.badge && (
                     <Image src={tag.badge} alt={tag.value} width={16} height={16} />
                   )}
-                  {tag.value}
+                  {tag.value} ({tag.count})
                 </Label>
               </AccordionContent>
             ))}
@@ -118,6 +125,7 @@ export const ProductsWithFilter = ({
 }: {
   products: Item[];
   tags: TagsWithCounts;
+  category: string;
 }) => {
   const [isLoading, startTransition] = useTransition();
 
@@ -125,60 +133,90 @@ export const ProductsWithFilter = ({
     "sort",
     parseAsString.withOptions({ startTransition }).withDefault("popular")
   );
+  const [activePage, setActivePage] = useState(1);
+  const totalPages = Math.ceil(products.length / 5);
 
   return (
-    <div className={cn("flex gap-4", isLoading && "pointer-events-none opacity-50")}>
+    <div
+      className={cn(
+        "container mb-8 mt-4 flex gap-4",
+        isLoading && "pointer-events-none opacity-50"
+      )}
+    >
       <div className="shrink-0 basis-1/4">
         <ItemsFilter tags={tags} startTransition={startTransition} />
       </div>
 
       <div className="flex-1">
         {products.length ? (
-          <>
-            <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
-              <div className="grid gap-1">
-                <h1 className="text-2xl font-bold tracking-tight">
-                  Jewellery Collection
-                </h1>
-                <p className="text-gray-500 dark:text-gray-400">
-                  Discover our unique selection of jewellery including hand-finished
-                  charms, bracelets, necklaces, rings and pendants to match your style
-                  and personality.
-                </p>
+          <div className="flex h-full flex-col justify-between gap-2">
+            <div className="space-y-2">
+              <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:gap-8">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="ml-auto shrink-0" variant="outline">
+                      <ArrowUpDownIcon className="mr-2 h-4 w-4" />
+                      Sort by
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[200px]">
+                    <DropdownMenuRadioGroup
+                      value={sortState}
+                      onValueChange={(val) => setSortState(val)}
+                    >
+                      <DropdownMenuRadioItem value="popular">
+                        Popular
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="date">Newest</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="low">
+                        Price: Low to High
+                      </DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="high">
+                        Price: High to Low
+                      </DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button className="ml-auto shrink-0" variant="outline">
-                    <ArrowUpDownIcon className="mr-2 h-4 w-4" />
-                    Sort by
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-[200px]">
-                  <DropdownMenuRadioGroup
-                    value={sortState}
-                    onValueChange={(val) => setSortState(val)}
-                  >
-                    <DropdownMenuRadioItem value="popular">
-                      Popular
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="date">Newest</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="low">
-                      Price: Low to High
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="high">
-                      Price: High to Low
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
+
+              <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+                {products
+                  .slice((activePage - 1) * 5, (activePage - 1) * 5 + 5)
+                  .map((product) => (
+                    <ListItem item={product} key={product._id} />
+                  ))}
+              </div>
             </div>
 
-            <div className="grid flex-1 grid-cols-3 gap-2">
-              {products.map((product) => (
-                <ListItem item={product} key={product._id} />
-              ))}
-            </div>
-          </>
+            <Pagination className="justify-end">
+              <PaginationContent className="[&>*]:cursor-pointer">
+                <PaginationPrevious
+                  className={cn(activePage === 1 && "cursor-not-allowed")}
+                  onClick={() => activePage !== 1 && setActivePage((p) => p - 1)}
+                />
+                {Array.from({
+                  length: Math.min(3, totalPages - Math.max(0, activePage - 1)),
+                }).map((_, i) => (
+                  <PaginationLink
+                    key={i}
+                    onClick={() =>
+                      setActivePage(activePage - 1 + i + Math.max(0, 2 - activePage))
+                    }
+                  >
+                    {activePage - 1 + i + Math.max(0, 2 - activePage)}
+                  </PaginationLink>
+                ))}
+
+                {totalPages > 3 && <PaginationEllipsis />}
+                <PaginationNext
+                  className={cn(activePage === totalPages && "cursor-not-allowed")}
+                  onClick={() =>
+                    activePage !== totalPages && setActivePage((p) => p + 1)
+                  }
+                />
+              </PaginationContent>
+            </Pagination>
+          </div>
         ) : (
           <div className="text-center">
             <h3 className="text-2xl font-bold tracking-tight">No products found</h3>

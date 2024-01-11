@@ -25,12 +25,6 @@ export const collectionSchema = defineType({
       options: { source: "name" },
     }),
     defineField({
-      name: "items",
-      title: "Items",
-      type: "array",
-      of: [{ type: "reference", to: [{ type: "item" }] }],
-    }),
-    defineField({
       name: "sections",
       title: "Sections",
       type: "array",

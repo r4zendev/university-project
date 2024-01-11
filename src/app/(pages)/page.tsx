@@ -1,8 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import { FrontPageCarousel } from "~/components/carousel";
-import { CategoryItem, ListItem } from "~/components/list-item";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { DragFreeCarousel } from "~/components/carousels/basic";
+import { TopPageCarousel } from "~/components/carousels/top-page";
+import { AspectRatio } from "~/components/ui/aspect-ratio";
 import {
   getBannerImage,
   getCategories,
@@ -49,85 +50,59 @@ export default async function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       {banner && (
-        <div className="relative mb-4 h-[250px] w-full border-4 border-accent">
-          <Image fill src={banner.image} alt={banner.alt ?? "Banner"} />
-        </div>
+        <AspectRatio ratio={16 / 8}>
+          {banner.url ? (
+            <Link href={banner.url}>
+              <Image fill src={banner.image} alt={banner.alt ?? "Banner"} />
+            </Link>
+          ) : (
+            <Image fill src={banner.image} alt={banner.alt ?? "Banner"} />
+          )}
+        </AspectRatio>
       )}
 
-      {carouselItems.length > 0 && (
-        <FrontPageCarousel slides={carouselItems.map((item) => item.image)} />
-      )}
+      <div className="w-full max-w-7xl lg:container">
+        {carouselItems.length > 0 && <TopPageCarousel items={carouselItems} />}
 
-      <Card className="my-4 w-full rounded-xl bg-white px-8 py-4">
-        <CardContent>
-          <CardHeader>
-            <CardTitle className="text-2xl font-semibold text-primary">
-              Categories
-            </CardTitle>
-          </CardHeader>
-          <div className="mt-4 flex items-center justify-center gap-4">
-            {categories.map((item) => (
-              <CategoryItem key={item.name} category={item} />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        <div className="px-[1rem]">
+          <DragFreeCarousel
+            items={categories.map((c) => ({
+              ...c,
+              category: { slug: c.slug },
+              url: `/${c.slug}`,
+            }))}
+          />
 
-      {featuredItems.length > 0 && (
-        <Card className="my-4 w-full rounded-xl bg-white px-8 py-4">
-          <CardContent>
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-primary">
+          {featuredItems.length > 0 && (
+            <div>
+              <p className="mb-2 mt-4 text-lg font-semibold text-primary lg:text-2xl">
                 Featured items
-              </CardTitle>
-            </CardHeader>
-
-            <div className="mt-4 flex items-center justify-center gap-4">
-              {featuredItems.map((item) => (
-                <ListItem key={item.name} item={item} />
-              ))}
+              </p>
+              <DragFreeCarousel items={featuredItems} />
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {trendingItems.length > 0 && (
-        <Card className="my-4 w-full rounded-xl bg-white px-8 py-4">
-          <CardContent>
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-primary">
+          {trendingItems.length > 0 && (
+            <div>
+              <p className="mb-2 mt-4 text-lg font-semibold text-primary lg:text-2xl">
                 Trending items
-              </CardTitle>
-            </CardHeader>
-
-            <div className="mt-4 flex items-center justify-center gap-4">
-              {trendingItems.map((item) => (
-                <ListItem key={item._id} item={item} />
-              ))}
+              </p>
+              <DragFreeCarousel items={trendingItems} />
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
 
-      {viewedItems.length > 0 && (
-        <Card className="my-4 w-full rounded-xl bg-white px-8 py-4">
-          <CardContent>
-            <CardHeader>
-              <CardTitle className="text-2xl font-semibold text-primary">
-                Recently viewed
-              </CardTitle>
-            </CardHeader>
-
-            <div className="mt-4 flex items-center justify-center gap-4">
-              {viewedItems.map((item) => (
-                <ListItem key={item.name} item={item} />
-              ))}
+          {viewedItems.length > 0 && (
+            <div>
+              <p className="mb-2 mt-4 text-lg font-semibold text-primary lg:text-2xl">
+                Viewed items
+              </p>
+              <DragFreeCarousel items={viewedItems} />
             </div>
-          </CardContent>
-        </Card>
-      )}
-    </main>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }

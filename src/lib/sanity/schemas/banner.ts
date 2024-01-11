@@ -4,6 +4,11 @@ export const bannerSchema = defineType({
   name: "banner",
   title: "Banners",
   type: "document",
+  preview: {
+    select: {
+      title: "position",
+    },
+  },
   fields: [
     defineField({
       name: "image",
@@ -46,7 +51,6 @@ export const bannerSchema = defineType({
       name: "url",
       title: "Link",
       type: "string",
-      validation: (Rule) => Rule.regex(/^\/([^\/\s]+\/?)*$/),
     }),
     defineField({
       name: "position",

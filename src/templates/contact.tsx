@@ -1,6 +1,5 @@
 import {
   Body,
-  Button,
   Container,
   Font,
   Head,
@@ -9,24 +8,28 @@ import {
   Preview,
   Section,
   Tailwind,
-  Text,
 } from "@react-email/components";
-import { marked } from "marked";
+import type { Metadata } from "next";
 
-import type { Email } from "~/lib/sanity/types";
+import { Card, CardContent } from "~/components/ui/card";
 
-export type StandardTemplateProps = Email & {
-  name: string | null;
-  productName: string;
+export type ContactUs = {
+  name: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
 };
 
-export function EmailTemplate({
-  content,
-  link,
-  subject,
-  name,
-  productName,
-}: StandardTemplateProps) {
+export const metadata: Metadata = {
+  title: "Silverstone | Contact Us",
+  icons: [
+    { rel: "icon", url: "/favicon.ico" },
+    { rel: "apple-icon", url: "/apple-touch-icon.png" },
+  ],
+};
+
+export function ContactTemplate({ email, message, name, phone, subject }: ContactUs) {
   return (
     <Html lang="en">
       <Tailwind
@@ -64,39 +67,35 @@ export function EmailTemplate({
           />
           <meta charSet="utf-8" />
           <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-          <title>{subject}</title>
+          <title>New contact request</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <style type="text/css"></style>
         </Head>
 
-        {/* <MailContent {...props} /> */}
-        <Preview>{subject}</Preview>
+        <Preview>Someone contacted you</Preview>
 
         <Body className="bg-gray-200 pt-12">
           <Container className="border-y-2 border-solid border-gray-400 bg-white px-6">
             <Heading>{subject}</Heading>
 
-            <Text>Hey{name ? `, ${name}` : " there"}!</Text>
-
             <Section>
-              <div dangerouslySetInnerHTML={{ __html: marked.parse(content) }} />
+              <main className="flex h-screen flex-col items-center justify-center bg-gray-100 p-4 md:p-8">
+                <p>
+                  Request by: {email} ({name})
+                </p>
+                {phone && <p>Phone: {phone}</p>}
+
+                <div>
+                  <Card>
+                    <CardContent>
+                      <p className="text-lg font-bold">Message</p>
+                      <p>{message}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </main>
             </Section>
-
-            {link && (
-              <Section className="text-center">
-                <Button
-                  href={link}
-                  className="mx-auto my-6 rounded-lg bg-primary px-8 py-3 text-center text-lg text-primary-foreground"
-                >
-                  Go to {productName}
-                </Button>
-              </Section>
-            )}
           </Container>
-
-          <Text className="my-8 text-center text-slate-500">
-            &copy; {productName}. All rights reserved.
-          </Text>
         </Body>
       </Tailwind>
     </Html>

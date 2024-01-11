@@ -16,11 +16,15 @@ import { formatStripePrice } from "~/lib/utils";
 export default async function CheckoutSuccess({
   searchParams,
 }: {
-  searchParams: { payment_intent: string; payment_intent_client_secret: string };
+  searchParams: {
+    payment_intent: string;
+    payment_intent_client_secret: string;
+    amountPaid: string;
+    content: string;
+    email: string;
+    address: string;
+  };
 }) {
-  // const searchParams = useSearchParams();
-
-  // const paymentIntentId = searchParams.get("payment_intent");
   const paymentIntentId = searchParams.payment_intent;
   if (!paymentIntentId) {
     return null;

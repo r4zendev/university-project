@@ -15,4 +15,6 @@ export const GET_FAQ_GROUPS_TAG = "get-faq-groups";
 export const GET_UNACTED_INQUIRIES_TAG = "get-unacted-inquiries";
 export const GET_ALL_ORDERS_TAG = "get-orders";
 export const GET_PENDING_ORDERS_TAG = "get-pending-orders";
+export const CREATE_ORDER_TAG = "create-order";
 export const GET_COLLECTIONS_TAG = "get-collections";
+export const GET_ALL_TAGS_TAG = "get-all-tags";
